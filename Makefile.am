@@ -7,6 +7,11 @@ endif
 
 AM_CFLAGS = -O2 -g -Wall
 
+if ANDROID_HOST
+  AM_CFLAGS += -fPIE
+  AM_LDFLAGS = -pie
+endif
+
 lib_LTLIBRARIES = libscanmem.la
 
 libscanmem_la_SOURCES = commands.h \
@@ -31,11 +36,16 @@ libscanmem_la_SOURCES = commands.h \
     target_memory_info_array.h \
     target_memory_info_array.c \
     value.h \
-    value.c 
+    value.c
 
 if !WITH_READLINE
   libscanmem_la_SOURCES += readline.h \
       readline.c
+endif
+
+if !HAVE_GETLINE
+  libscanmem_la_SOURCES += getline.h \
+      getline.c
 endif
 
 libscanmem_la_LDFLAGS = -version-info 1:0:0

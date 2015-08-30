@@ -10,12 +10,12 @@
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 2 of the License, or
  (at your option) any later version.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of
  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  GNU General Public License for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; if not, write to the Free Software
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
@@ -35,6 +35,10 @@
 #include <alloca.h>
 #include <stdbool.h>
 #include <unistd.h>
+
+#ifndef HAVE_GETLINE
+#include "getline.h"
+#endif
 
 #include "list.h"
 #include "maps.h"
@@ -97,7 +101,7 @@ bool readmaps(pid_t target, list_t * regions)
                 show_error("failed to allocate %lu bytes for filename.\n", (unsigned long)len);
                 goto error;
             }
-            
+
             /* initialise to zero */
             memset(filename, '\0', len);
 
@@ -197,7 +201,7 @@ bool readmaps(pid_t target, list_t * regions)
                             {
                                 useful = true;
                                 break;
-                            } 
+                            }
                             /* fall through */
                         case REGION_HEAP_STACK_EXECUTABLE:
                             if (type == REGION_TYPE_HEAP || type == REGION_TYPE_STACK)
@@ -211,7 +215,7 @@ bool readmaps(pid_t target, list_t * regions)
                                 useful = true;
                         break;
                 }
-                   
+
                 if (!useful)
                     continue;
 
@@ -242,7 +246,7 @@ bool readmaps(pid_t target, list_t * regions)
 
                 /* add a unique identifier */
                 map->id = regions->size;
-                
+
                 /* okay, add this guy to our list */
                 if (l_append(regions, regions->tail, map) == -1) {
                     show_error("failed to save region.\n");
@@ -253,7 +257,7 @@ bool readmaps(pid_t target, list_t * regions)
     }
 
     show_info("%d suitable regions found.\n", regions->size);
-    
+
     /* release memory allocated */
     free(line);
     fclose(maps);
@@ -268,7 +272,6 @@ bool readmaps(pid_t target, list_t * regions)
 }
 
 int compare_region_id(const region_t *a, const region_t *b)
-{    
+{
     return (int) (a->id - b->id);
 }
-

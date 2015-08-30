@@ -13,6 +13,9 @@ IT_PROG_INTLTOOL
 
 AC_CHECK_FUNCS(memset strcasecmp strchr strdup strerror strtoul)
 
+AC_CHECK_FUNC(getline, [], [have_getline=0])
+AM_CONDITIONAL([HAVE_GETLINE], [test "x$have_getline" != "x0"])
+
 AC_CHECK_HEADERS(fcntl.h limits.h stddef.h sys/time.h)
 
 AC_FUNC_ALLOCA
@@ -35,24 +38,32 @@ AC_TYPE_SSIZE_T
 
 AC_C_BIGENDIAN
 
-
-# also need to check if the file is zero'ed (some hardened systems)
-AC_CHECK_FILE([/proc/self/maps], [], [
+AM_CONDITIONAL([ANDROID_HOST],
+              [test "${ac_cv_env_host_alias_value/android//}" = "$ac_cv_env_host_alias_value"])
+AS_IF([test "${ac_cv_env_host_alias_value/android//}" = "$ac_cv_env_host_alias_value"], [
+  # also need to check if the file is zero'ed (some hardened systems)
+  AC_CHECK_FILE([/proc/self/maps], [], [
     echo "This system does not seem to have /proc/pid/maps files."
     exit 1
-])
+  ])
 
-# also need to check this file works
-AC_CHECK_FILE([/proc/self/mem], [
+  # also need to check this file works
+  AC_CHECK_FILE([/proc/self/mem], [
     # LARGEFILE support required for this to work
     AC_SYS_LARGEFILE
     AC_DEFINE(HAVE_PROCMEM, [1], [Enable /proc/pid/mem support])
-],[
+  ],[
     # This will hurt performance.
     echo "This system does not seem to have /proc/pid/mem files."
     echo "Falling back to ptrace() only support."
     AC_DEFINE(HAVE_PROCMEM, [0], [Enable /proc/pid/mem support])
+  ])
+], [
+  # supported on Android
+  AC_SYS_LARGEFILE
+  AC_DEFINE(HAVE_PROCMEM, [1], [Enable /proc/pid/mem support])
 ])
+
 
 # copied from ubuntu-tweak
 
@@ -106,7 +117,7 @@ AC_DEFINE_UNQUOTED([GETTEXT_PACKAGE], ["$GETTEXT_PACKAGE"],
                    [The domain to use with gettext])
 AS_AC_EXPAND(LOCALEDIR, $localedir)
 
-AC_CONFIG_FILES([ 
+AC_CONFIG_FILES([
                 Makefile
                 po/Makefile.in
                 ])

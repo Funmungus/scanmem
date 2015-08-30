@@ -18,9 +18,17 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#include "config.h"
+
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "readline.h"
+
+#ifndef HAVE_GETLINE
+#include "getline.h"
+#endif
 
 int rl_attempted_completion_over = 0;
 const char *rl_readline_name = "scanmem";
