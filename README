@@ -15,9 +15,22 @@ multiple memory locking and a memory editor.
 scanmem requires libreadline to read commands interactively, and /proc must be
 mounted.
 
+## Install for android
+
+You need a [standalone toolchain of Android NDK](https://developer.android.com/ndk/guides/standalone_toolchain.html#itc) (the Advanced method) to 
+build scanmem for android, run:
+
+    # run autogen.sh if "./configure" doesn't exist
+    ./autogen.sh
+    
+    export NDK_STANDALONE_TOOLCHAIN=/your/toolchain/path
+    ./build_for_android.sh
+
+And then copy `$NDK_STANDALONE_TOOLCHAIN/sysroot/usr/bin/scanmem` to `/system/bin` or `/system/xbin` of your android devices.
 
 ## Install
 If you obtained the source from the source repository (instead of a archive), run:
+
     ./autogen.sh
 
 To build with gui:
